@@ -1,6 +1,6 @@
 'use strict';
 import {User, Op, Block, Group} from '../models/index';
-import {response} from '../helpers';
+import {response, encryptHelper} from '../helpers';
 
 
 export default class UserController {
@@ -27,5 +27,20 @@ export default class UserController {
             });
         }
     };
+    createUser = async (req, res, next) => {
+        try {
+            const {username, password, address} = req.body;
+            let hash = await encryptHelper.hashPassword(password);
+            let newUser = await User.create({
+                username,
+                password: hash,
+                address,
+                role: "normal",
+            });
+            return response.returnSuccess(res, newUser);
+        } catch (e) {
+            return response.returnError(res, e)
+        }
+    }
 
 }

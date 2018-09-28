@@ -1,7 +1,7 @@
 
 {
   "username": "postgres",
-  "password": "tuyendola97",
+  "password": "k0thetinnoi",
   "database": "chatting",
   "host": "localhost",
   "port": 5432,
