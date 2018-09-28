@@ -4,7 +4,7 @@ import { privateKey, publicKey } from '../config'
 
 export default class JWTHelper {
 
-     async sign (data) {
+     static async sign (data) {
         return new Promise((resolve, reject) => {
             JWT.sign(data, privateKey,
                 {

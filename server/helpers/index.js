@@ -1,9 +1,9 @@
-import response from "./response-helper";
-import JWTHelper from './jwt-helper'
+import Response from './response-helper';
+import EncryptionHelper from './encryption-helper';
+import JWTHelper from './jwt-helper';
 
 module.exports = {
-    response: new response(),
+    Response,
+    EncryptionHelper,
     JWTHelper: new JWTHelper()
-
-
 };
