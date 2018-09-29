@@ -85,4 +85,20 @@ export default class UserController {
             return Response.returnError(res, new Error (e.message));
         }
     };
+
+    createUser = async (req, res, next) => {
+        try {
+            const {username, password, address} = req.body;
+            let hash = await EncryptionHelper.hash(password);
+            let newUser = await User.create({
+                username,
+                password: hash,
+                address,
+                role: "normal",
+            });
+            return Response.returnSuccess(res, newUser);
+        } catch (e) {
+            return Response.returnError(res, e)
+        }
+    }
 }
