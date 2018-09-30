@@ -88,29 +88,18 @@ export default class UserController {
 
     createUser = async (req, res, next) => {
         try {
-<<<<<<< HEAD
-            const {username, password, address} = req.body;
-=======
             const {role, username, password, address} = req.body;
->>>>>>> feature/thuyngan
             let hash = await EncryptionHelper.hash(password);
             let newUser = await User.create({
                 username,
                 password: hash,
                 address,
-<<<<<<< HEAD
-                role: "normal",
-=======
                 role,
->>>>>>> feature/thuyngan
             });
             return Response.returnSuccess(res, newUser);
         } catch (e) {
             return Response.returnError(res, e)
         }
-<<<<<<< HEAD
-    }
-=======
     };
 
     updateUser = async (req, res, next) => {
@@ -159,5 +148,4 @@ export default class UserController {
             return Response.returnError(res, e);
         }
     };
->>>>>>> feature/thuyngan
 }

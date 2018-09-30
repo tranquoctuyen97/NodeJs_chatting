@@ -2,11 +2,7 @@
 
 import {userController} from '../controllers';
 import {Authentication} from '../middlewares';
-<<<<<<< HEAD
-import {Validation} from '../middlewares';
-=======
 import {Validation, RoleManagement} from '../middlewares';
->>>>>>> feature/thuyngan
 
 
 module.exports = (app) => {
@@ -14,8 +10,6 @@ module.exports = (app) => {
     app.route('/users')
         .get([Authentication.isAuth], userController.getListUser)
         .post([Validation.validationCreateUser],userController.createUser);
-<<<<<<< HEAD
-=======
 
     app.route('/users/:id')
         .get([Authentication.isAuth], userController.getOneUser)
@@ -24,12 +18,6 @@ module.exports = (app) => {
 
     app.route('/login')
         .post(userController.login);
->>>>>>> feature/thuyngan
 
-    app.route('/users/:id')
-        .get([Authentication.isAuth], userController.getOneUser);
-
-    app.route('/login')
-        .post(userController.login);
 
 };
