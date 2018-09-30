@@ -24,11 +24,11 @@ export default class  Authentication {
                 return Response.returnError(res, new Error('Token is not provided'));
             }
             const jwtValid = await JWTHelper.verify(token);
-                const user = userRepository.getOne({
+                const user = await userRepository.getOne({
                 where: {
                     id: jwtValid.id
                 },
-                attributes: ['id', 'username']
+                attributes: ['id', 'username', 'role']
             });
             if (!user) {
                 return Response.returnError(res, new Error('User invalidate'));

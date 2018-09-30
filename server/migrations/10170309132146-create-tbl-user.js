@@ -25,8 +25,7 @@ module.exports = {
                 }
             },
             role: {
-                type: DataTypes.ENUM,
-                values: ['normal', 'admin']
+                type: DataTypes.ENUM(['normal', 'admin'])
             },
             avatar: {
                 type: DataTypes.STRING

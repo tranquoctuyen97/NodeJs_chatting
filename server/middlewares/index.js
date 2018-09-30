@@ -4,5 +4,5 @@ import Validation from "./validation";
 module.exports = {
     Authentication,
     RoleManagement,
-    Validation
+    Validation,
 }

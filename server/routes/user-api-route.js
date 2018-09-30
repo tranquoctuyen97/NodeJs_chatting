@@ -2,7 +2,7 @@
 
 import {userController} from '../controllers';
 import {Authentication} from '../middlewares';
-import {Validation} from '../middlewares';
+import {Validation, RoleManagement} from '../middlewares';
 
 
 module.exports = (app) => {
@@ -12,9 +12,12 @@ module.exports = (app) => {
         .post([Validation.validationCreateUser],userController.createUser);
 
     app.route('/users/:id')
-        .get([Authentication.isAuth], userController.getOneUser);
+        .get([Authentication.isAuth], userController.getOneUser)
+        .put([Authentication.isAuth],userController.updateUser)
+        .delete([Authentication.isAuth, RoleManagement.isAdmin], userController.deleteUser);
 
     app.route('/login')
         .post(userController.login);
+
 
 };
