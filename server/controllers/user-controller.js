@@ -88,17 +88,76 @@ export default class UserController {
 
     createUser = async (req, res, next) => {
         try {
+<<<<<<< HEAD
             const {username, password, address} = req.body;
+=======
+            const {role, username, password, address} = req.body;
+>>>>>>> feature/thuyngan
             let hash = await EncryptionHelper.hash(password);
             let newUser = await User.create({
                 username,
                 password: hash,
                 address,
+<<<<<<< HEAD
                 role: "normal",
+=======
+                role,
+>>>>>>> feature/thuyngan
             });
             return Response.returnSuccess(res, newUser);
         } catch (e) {
             return Response.returnError(res, e)
         }
+<<<<<<< HEAD
     }
+=======
+    };
+
+    updateUser = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const { username, address } = req.body;
+            const userLoginId = req.user.id;
+
+            if ( id !== userLoginId)
+            {
+                return Response.returnError(res, new Error('You are not author!'));
+            }
+            const updatedUser = await userRepository.update(
+                {
+                    username,
+                    address
+                },
+                {
+                    where: {
+                        id
+                    },
+                    returning: true
+                }
+            );
+            if (updatedUser[0] === 0)
+            {
+                return Response.returnError(res, new Error('Cannot update user'));
+            }
+            return Response.returnSuccess(res, updatedUser[1]);
+        } catch (e) {
+            return Response.returnError(res, e);
+        }
+    };
+    deleteUser = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            await userRepository.delete({
+                where: {
+                    id
+                }
+            });
+            return Response.returnSuccess(res, {
+                success: "true"
+            });
+        } catch (e) {
+            return Response.returnError(res, e);
+        }
+    };
+>>>>>>> feature/thuyngan
 }
