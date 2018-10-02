@@ -1,14 +1,13 @@
 'use strict';
 
 import {userController} from '../controllers';
-import {Authentication} from '../middlewares';
-import {Validation, RoleManagement} from '../middlewares';
+import { Authentication, Validation, RoleManagement} from '../middlewares';
 
 
 module.exports = (app) => {
 
     app.route('/users')
-        .get([Authentication.isAuth], userController.getListUser)
+        .get([Authentication.isAuth, RoleManagement.isAdmin], userController.getListUser)
         .post([Validation.validationCreateUser],userController.createUser);
 
     app.route('/users/:id')

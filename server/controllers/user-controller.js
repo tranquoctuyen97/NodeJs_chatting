@@ -7,25 +7,36 @@ export default class UserController {
 
     getListUser = async (req, res, next) => {
         try {
-            const users = await User.findAll({
-                order: [
-                    ['createdAt', 'DESC']
-                ],
-                include: [
-                    {
-                        model: Block,
-                        as: 'blocks',
-                        required: false
-                    }
-                ],
-            });
-            return Response.returnSuccess(res, users);
-        } catch (e) {
-            return res.status(400).json({
-                success: false,
-                error: e.message
-            });
+        const { page, limit } = req.query;
+        const offset = ( page - 1)  * limit;
+        if (!page ) {
+            return Response.returnError(res, new Error('Page is invalid '));
+        } 
+        if( !limit ) {
+            return Response.returnError(res,new Error('Limit is invalid'));
         }
+        
+        if ( !(page % 1  == 0) || page < 1 ) {
+            return Response.returnError(res, new Error('Page is invalid '))
+        }
+        
+        if ( !(limit % 1  == 0) || limit < 1 ) {
+            return Response.returnError(res, new Error('Limit is invalid '))
+        }
+        const users = await userRepository.getAll({
+            order: [
+                ['createdAt', 'DESC']
+            ],
+            attributes: {
+                exclude: ['password']
+            },
+            offset,
+            limit
+        });
+        return Response.returnSuccess(res, users);
+    } catch (e) {
+        return Response.returnError(res,e);
+    }
     };
 
     login = async (req, res, next) => {
