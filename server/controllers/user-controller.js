@@ -101,7 +101,7 @@ export default class UserController {
         try {
             const {role, username, password, address} = req.body;
             let hash = await EncryptionHelper.hash(password);
-            let newUser = await User.create({
+            let newUser = await userRepository.create({
                 username,
                 password: hash,
                 address,

@@ -1,5 +1,5 @@
 'user strict';
-import {response} from '../helpers';
+import {Response} from '../helpers';
 
 export default class  Validation {
     static validateEmail = (email) => {
@@ -9,16 +9,16 @@ export default class  Validation {
     static validationCreateUser (req, res, next) {
         const {username, password, address} = req.body;
         if (username === '' || username === undefined){
-            return response.returnError(res, new Error('username empty'));
+            return Response.returnError(res, new Error('username empty'));
         }
         if (!Validation.validateEmail(username)){
-            return response.returnError(res, new Error('username not email'));
+            return Response.returnError(res, new Error('username not email'));
         }
         if (password === '' || password === undefined){
-            return response.returnError(res, new Error('password empty'));
+            return Response.returnError(res, new Error('password empty'));
         }
         if (!Array.isArray(address)|| address.length === 0) {
-            return response.returnError(res, new Error('address not invalid'));
+            return Response.returnError(res, new Error('address not invalid'));
         }
         return next();
 
