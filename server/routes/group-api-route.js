@@ -6,8 +6,9 @@ import { Authentication} from '../middlewares';
 
 module.exports = (app) => {
 
-    app.route('/group')
+    app.route('/groups')
+        .get([Authentication.isAuth], groupController.getListActiveGroup)
         .post([Authentication.isAuth], groupController.createGroup);
-    app.route('/group/:id/leave')
+    app.route('/groups/:id/leave')
         .delete([Authentication.isAuth], memberGroupController.leaveGroup);
 };

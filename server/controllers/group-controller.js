@@ -4,6 +4,36 @@ import {Response, EncryptionHelper, JWTHelper} from '../helpers';
 import {groupRepository, memberGroupRepository} from '../repositories'
 
 export default class GroupController {
+    getActiveGroupIds = async (userId) => {
+        const memberGroups = await memberGroupRepository.getAll({
+            where: {
+                userId
+            },
+            attributes: ['groupId']
+        });
+        return memberGroups.map(item => item.groupId);
+    };
+    getListActiveGroup = async (req, res, next) => {
+        try {
+            const groupIds = await  this.getActiveGroupIds(req.user.id);
+            const groups = await groupRepository.getAll(
+                    {
+                        where: {
+                            id: groupIds
+                        },
+                        attributes: {
+                            exclude: ['authorId']
+                        },
+                        order: [
+                            ['createdAt', 'DESC']
+                        ]
+                    }
+                );
+            return Response.returnSuccess(res, groups);
+        } catch (e) {
+            return Response.returnError(res, e);
+        }
+    };
     createGroup = async (req, res, next) => {
         let newGroup = null;
         try {
@@ -48,7 +78,7 @@ export default class GroupController {
                     return Response.returnError(res, new Error('type is invalid'));
             }
             newGroup = await groupRepository.create({
-               name,
+                name,
                 type,
                 authorId,
                 partnerId,
@@ -77,5 +107,6 @@ export default class GroupController {
             }
             return Response.returnError(res, e)
         }
-    }
+    };
+
 }
