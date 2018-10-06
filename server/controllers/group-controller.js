@@ -64,7 +64,7 @@ export default class GroupController {
                 where: {
                     id: newGroup.id,
                 }
-            })
+            });
             return Response.returnSuccess(res, group);
         } catch (e) {
             if (newGroup) {
@@ -77,5 +77,98 @@ export default class GroupController {
             }
             return Response.returnError(res, e)
         }
+    };
+
+    addMemberToGroup = async (req, res, next) => {
+        try {
+            const userLoginId = req.user.id;
+            const {memberIds} = req.body;
+            const groupId = req.params.id;
+            let memberGroupIds = [];
+            let newMemberGroups = [];
+
+            if (memberIds === undefined || !Array.isArray(memberIds) || memberIds.length === 0) {
+                return Response.returnError(res, new Error('Member group is invalid'));
+            }
+
+            const memberGroup = await memberGroupRepository.getAll({
+                where: {
+                    groupId
+                },
+                attributes: ['userId']
+            });
+
+            if (!memberGroup) {
+                return Response.returnError(res, new Error('Group not found'));
+            }
+
+            for (let member of memberGroup) {
+                memberGroupIds.push(member.userId)
+            }
+
+            if (!memberGroupIds.includes(userLoginId)) {
+                return Response.returnError(res, new Error('User was not in that group'));
+            }
+
+            for (let memberId of memberIds) {
+                if (memberId !== userLoginId && !memberGroupIds.includes(memberId)) {
+                    memberGroupIds.push(memberId);
+                    newMemberGroups.push(memberId);
+                }
+            }
+
+            const memberGroups = newMemberGroups.map(item => {
+                return {
+                    userId: item,
+                    groupId: groupId
+                }
+            });
+
+            let newMembers = await memberGroupRepository.bulkCreate(memberGroups);
+            return Response.returnSuccess(res, newMembers);
+        } catch (e) {
+            return Response.returnError(res, e.message);
+        }
+    };
+
+    joinToGroup = async (req, res, next) => {
+        try {
+            const userLoginId = req.user.id;
+            const groupId = req.params.id;
+            let memberGroupIds = [];
+            const memberGroup = await memberGroupRepository.getAll({
+                where: {
+                    groupId
+                },
+                attributes: ['userId']
+            });
+
+            if (!memberGroup) {
+                return Response.returnError(res, new Error('Group not found'));
+            }
+
+            for (let member of memberGroup) {
+                memberGroupIds.push(member.userId)
+            }
+
+            if (memberGroupIds.includes(userLoginId)) {
+                return Response.returnError(res, new Error('User had been in that group'));
+            }
+
+            const newMemberInGroup = await MemberGroup.create(
+                {
+                    userId: userLoginId,
+                    groupId,
+                });
+            return Response.returnSuccess(res, newMemberInGroup);
+        } catch (e) {
+            return Response.returnError(res, e);
+        }
+    };
+
+    test = async (req, res, next) => {
+        Response.returnSuccess(res, {
+            data: "ok"
+        })
     }
 }
