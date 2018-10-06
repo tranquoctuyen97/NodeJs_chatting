@@ -1,4 +1,4 @@
 node_modules
 .idea
 package-lock.json
-server/config/db-config.json
+db-config.json
