@@ -18,6 +18,7 @@ module.exports = (app) => {
         .put([ Authentication.isAuth, RoleManagement.isAdmin], userController.updateActiveUser);
     app.route('/login')
         .post(userController.login);
-
+    app.route('/users/searchUser')
+        .post([Authentication.isAuth], userController.getUserByUsername);
 
 };

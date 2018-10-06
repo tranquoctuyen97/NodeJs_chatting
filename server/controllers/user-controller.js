@@ -101,13 +101,13 @@ export default class UserController {
         try {
             const {role, username, password, address} = req.body;
             let hash = await EncryptionHelper.hash(password);
-            let newUser = await User.create({
+            let newUser = await userRepository.create({
                 username,
                 password: hash,
                 address,
                 role,
             });
-            return Response.returnSuccess(res, newUser);
+            return Response.returnSuccess(res, 'success');
         } catch (e) {
             return Response.returnError(res, e)
         }
@@ -190,4 +190,27 @@ export default class UserController {
             return Response.returnError(res, error);
         }
     };
+    getUserByUsername = async (req, res, next) => {
+        try {
+            const {username} = req.body;
+            if (username === undefined) {
+                return Response.returnError(res, new Error('username is required field'));
+            }
+            const user = await User.find({
+                where: {
+                    username,
+                },
+                attributes: {
+                    exclude: ['password']
+                },
+            });
+            console.log(user);
+            if (!user) {
+                return Response.returnError(res, new Error ('User is not found'));
+            }
+            return Response.returnSuccess(res, user);
+        } catch (e) {
+            return Response.returnError(res, e);
+        }
+    }
 }
