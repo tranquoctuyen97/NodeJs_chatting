@@ -1,6 +1,6 @@
 'use strict';
 
-import {groupController} from '../controllers';
+import {groupController,memberGroupController} from '../controllers';
 import { Authentication} from '../middlewares';
 
 
@@ -8,8 +8,11 @@ module.exports = (app) => {
 
     app.route('/groups')
         .post([Authentication.isAuth], groupController.createGroup);
-
-    app.route('/groups/add-member-to-group')
+    app.route('/groups/:id/leave')
+        .delete([Authentication.isAuth], memberGroupController.leaveGroup);
+    app.route('/groups/:id/join-group')
+        .post([Authentication.isAuth], groupController.joinToGroup);
+    app.route('/groups/:id/add-member')
         .post([Authentication.isAuth], groupController.addMemberToGroup);
 
 };

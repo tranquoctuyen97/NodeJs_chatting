@@ -5,8 +5,8 @@ import {Group} from '../models/'
 
 export default class GroupRepository extends BaseRepository {
 
-    constructor() {
-        super(Group);
-    }
+	constructor() {
+		super(Group);
+	}
 
 }

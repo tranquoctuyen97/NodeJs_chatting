@@ -14,9 +14,11 @@ module.exports = (app) => {
         .get([Authentication.isAuth], userController.getOneUser)
         .put([Authentication.isAuth],userController.updateUser)
         .delete([Authentication.isAuth, RoleManagement.isAdmin], userController.deleteUser);
-
+    app.route('/users/:id/changeActive')
+        .put([ Authentication.isAuth, RoleManagement.isAdmin], userController.updateActiveUser);
     app.route('/login')
         .post(userController.login);
-
+    app.route('/users/searchUser')
+        .post([Authentication.isAuth], userController.getUserByUsername);
 
 };

@@ -47,4 +47,5 @@ export default class BaseRepository {
     async delete (options) {
         return await this._model.destroy(options);
     }
+
 }

@@ -1,90 +1,89 @@
 'use strict';
-import {User, Op, MemberGroup, Group} from '../models/index';
-import {Response} from '../helpers';
-import {groupRepository, memberGroupRepository} from '../repositories';
+import {User, Op, Block, Group, MemberGroup} from '../models/index';
+import {Response, EncryptionHelper, JWTHelper} from '../helpers';
+import {groupRepository, memberGroupRepository} from '../repositories'
 
 export default class GroupController {
     createGroup = async (req, res, next) => {
         let newGroup = null;
         try {
-            const userLoginId = req.user.id;
-            const {name, type, memberIds, partnerId} = req.body;
-            let memberGroupIds = [];
+            let {name, type, partnerId, memberIds} = req.body;
+            const authorId = req.user.id;
+            if (!type) {
+                return Response.returnError(res, new Error('type of group is required field'))
+            }
             switch (type) {
                 case 'private':
                     if (partnerId === undefined) {
-                        return Response.returnError(res, new Error('partnerId is required field'));
+                        return Response.returnError(res, new Error('partner is required for private group'))
                     }
-                    const existingGroup = await groupRepository.getOne({
+                    const existGroup = await groupRepository.getOne({
                         where: {
                             [Op.or]: [
                                 {
-                                    authorId: userLoginId,
-                                    partnerId: partnerId
+                                    authorId,
+                                    partnerId,
                                 },
                                 {
-                                    partnerId: userLoginId,
-                                    authorId: partnerId
+                                    authorId: partnerId,
+                                    partnerId: authorId,
                                 }
                             ]
                         }
                     });
-                    if (existingGroup) {
-                        return Response.returnSuccess(res, existingGroup);
+                    if (existGroup) {
+                        return Response.returnSuccess(res, existGroup);
                     }
-                    memberGroupIds = [userLoginId, partnerId];
+                    memberIds = [authorId, partnerId];
                     break;
                 case 'group':
-                    if (name === undefined) {
-                        return Response.returnError(res, new Error('Name group is required field'));
+                    if(memberIds === undefined|| !Array.isArray(memberIds)|| memberIds.length < 0) {
+                        return Response.returnError(res, new Error('member is invalid'));
                     }
-                    if (memberIds === undefined || !Array.isArray(memberIds) || memberIds.length === 0) {
-                        return Response.returnError(res, new Error('Member group is invalid'));
+                    if (memberIds.includes(authorId)) {
+                        memberIds[memberIds.length] = authorId;
                     }
-                    if (!memberIds.includes(userLoginId)) {
-                        memberIds[memberIds.length] = userLoginId;
-                    }
-                    memberGroupIds = memberIds;
                     break;
                 default:
-                    return Response.returnError(res, new Error('Invalid type group'));
+                    return Response.returnError(res, new Error('type is invalid'));
             }
             newGroup = await groupRepository.create({
-                name,
-                authorId: userLoginId,
+               name,
                 type,
-                partnerId
+                authorId,
+                partnerId,
             });
-            const memberGroups = memberGroupIds.map(item => {
+            const member = memberIds.map(item => {
                 return {
+                    groupId : newGroup.id,
                     userId: item,
-                    groupId: newGroup.id
                 }
             });
-            await memberGroupRepository.bulkCreate(memberGroups);
-            if (res !== undefined) {
-                return Response.returnSuccess(res, newGroup);
-            } else {
-                newGroup.memberGroupIds = memberGroupIds;
-                return newGroup;
-            }
+            await memberGroupRepository.bulkCreate(member);
+            const group = await groupRepository.getOne({
+                where: {
+                    id: newGroup.id,
+                }
+            });
+            return Response.returnSuccess(res, group);
         } catch (e) {
             if (newGroup) {
-                groupRepository.delete({
-                    force: true,
+                 groupRepository.delete({
+                    force : true,
                     where: {
-                        id: newGroup.id
+                        id: newGroup.id,
                     }
-                });
+                })
             }
-            return Response.returnError(res, e.message);
+            return Response.returnError(res, e)
         }
     };
 
     addMemberToGroup = async (req, res, next) => {
         try {
             const userLoginId = req.user.id;
-            const {groupId, memberIds} = req.body;
+            const {memberIds} = req.body;
+            const groupId = req.params.id;
             let memberGroupIds = [];
             let newMemberGroups = [];
 
@@ -126,10 +125,7 @@ export default class GroupController {
             });
 
             let newMembers = await memberGroupRepository.bulkCreate(memberGroups);
-            return Response.returnSuccess(res, {
-                success: "true",
-                data: newMembers
-            });
+            return Response.returnSuccess(res, newMembers);
         } catch (e) {
             return Response.returnError(res, e.message);
         }
@@ -137,20 +133,31 @@ export default class GroupController {
 
     joinToGroup = async (req, res, next) => {
         try {
-            const {groupId} = req.body;
-            const userId = req.user.id;
-            const group = await groupRepository.find({
+            const userLoginId = req.user.id;
+            const groupId = req.params.id;
+            let memberGroupIds = [];
+            const memberGroup = await memberGroupRepository.getAll({
                 where: {
-                    id: groupId
+                    groupId
                 },
-                attributes: (['createdAt'])
+                attributes: ['userId']
             });
-            if (!group) {
-                return Response.returnError(res, new Error('group dose not exist'))
+
+            if (!memberGroup) {
+                return Response.returnError(res, new Error('Group not found'));
             }
+
+            for (let member of memberGroup) {
+                memberGroupIds.push(member.userId)
+            }
+
+            if (memberGroupIds.includes(userLoginId)) {
+                return Response.returnError(res, new Error('User had been in that group'));
+            }
+
             const newMemberInGroup = await MemberGroup.create(
                 {
-                    userId,
+                    userId: userLoginId,
                     groupId,
                 });
             return Response.returnSuccess(res, newMemberInGroup);
@@ -159,4 +166,9 @@ export default class GroupController {
         }
     };
 
+    test = async (req, res, next) => {
+        Response.returnSuccess(res, {
+            data: "ok"
+        })
+    }
 }

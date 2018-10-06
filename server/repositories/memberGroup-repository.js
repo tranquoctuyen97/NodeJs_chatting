@@ -1,12 +1,12 @@
 'use strict';
 
 import BaseRepository from '../repositories/base-repository';
-import {MemberGroup} from '../models'
+import {MemberGroup} from '../models/'
 
 export default class MemberGroupRepository extends BaseRepository {
 
-    constructor() {
-        super(MemberGroup);
-    }
+	constructor() {
+		super(MemberGroup);
+	}
 
 }
