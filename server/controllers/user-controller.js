@@ -170,7 +170,7 @@ export default class UserController {
                 return Response.returnError(res, new Error('isActive is boolean'));
             }
             if ( !id ) {
-                return Response.returnError(res, new Error('id is invaild'));
+                return Response.returnError(res, new Error('id is invalid'));
             }
             const updateActive = await userRepository.update(
                 {
@@ -196,7 +196,7 @@ export default class UserController {
             if (username === undefined) {
                 return Response.returnError(res, new Error('username is required field'));
             }
-            const user = await User.find({
+            const user = await userRepository.getOne({
                 where: {
                     username,
                 },
