@@ -109,8 +109,6 @@ export default class GroupController {
         }
     };
 
-<<<<<<< HEAD
-=======
     addMemberToGroup = async (req, res, next) => {
         try {
             const userLoginId = req.user.id;
@@ -197,11 +195,4 @@ export default class GroupController {
             return Response.returnError(res, e);
         }
     };
-
-    test = async (req, res, next) => {
-        Response.returnSuccess(res, {
-            data: "ok"
-        })
-    }
->>>>>>> fc50a95fa334cbb9eb3ee9913aa043f28b454fd4
 }
