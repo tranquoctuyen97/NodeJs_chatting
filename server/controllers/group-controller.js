@@ -165,7 +165,51 @@ export default class GroupController {
             return Response.returnError(res, e);
         }
     };
+    getListMembersInGroup = async (req, res) => {
+        try {
+            const { id } = req.params;
+            const member = await  memberGroupRepository.getAll({
+                where: {
+                    groupId: id
+                },
+                attributes: ['id', 'userId']
+            });
+            if (member.length === 0) {
+                return Response.returnError(res, new Error('Group is not Exist'))
+            }
+            return Response.returnSuccess(res, member);
+        } catch (e) {
+            return Response.returnSuccess(res, e);
+        }
+    };
 
+    removeMemberInGroup = async (req, res, next) => {
+        try {
+            const { id, memberId }= req.params;
+            const userLoginId = req.user.id;
+            const isAuthor = groupRepository.getOne({
+                where: {
+                    id,
+                    authorId: userLoginId
+                }
+            });
+            if (!isAuthor) {
+                return Response.returnError(res, new Error('You are not author of group'));
+            }
+            const deleted = await  memberGroupRepository.delete({
+                where: {
+                    id: memberId,
+                    groupId: id
+                }
+            });
+            if (deleted === 0) {
+                return Response.returnError(res, new Error('Remove member in group wrong!'));
+            }
+            return Response.returnSuccess(res, 'Removed member')
+        } catch (e) {
+            return Response.returnError(res, e)
+        }
+    }
     test = async (req, res, next) => {
         Response.returnSuccess(res, {
             data: "ok"

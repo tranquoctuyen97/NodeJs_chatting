@@ -14,5 +14,12 @@ module.exports = (app) => {
         .post([Authentication.isAuth], groupController.joinToGroup);
     app.route('/groups/:id/add-member')
         .post([Authentication.isAuth], groupController.addMemberToGroup);
+    app.route('/groups/:id/members')
+        .get([Authentication.isAuth], groupController.getListMembersInGroup);
+    app.route('/groups/:id/:memberId')
+        .delete([Authentication.isAuth], groupController.removeMemberInGroup);
+
+
+
 
 };
