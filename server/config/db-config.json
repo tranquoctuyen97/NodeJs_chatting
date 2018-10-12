@@ -1,11 +1,7 @@
 
 {
   "username": "postgres",
-<<<<<<< HEAD
   "password": "tuyendola97",
-=======
-  "password": "12345678",
->>>>>>> fc50a95fa334cbb9eb3ee9913aa043f28b454fd4
   "database": "chatting",
   "host": "localhost",
   "port": 5432,
