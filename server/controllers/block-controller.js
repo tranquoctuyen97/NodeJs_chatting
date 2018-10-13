@@ -56,7 +56,8 @@ export default class BlockController {
                 where: {
                     groupId,
                     userId: id
-                }
+                },
+                attributes: ['id']
             });
             if (!isMember) {
                 return Response.returnError(res, new Error('user is not member group '));
