@@ -15,6 +15,14 @@ module.exports = (sequelize, DataTypes) => {
             authorId: {
                 type: DataTypes.UUID
             },
+            partnerId: {
+                type: DataTypes.UUID,
+                references: {
+                    model: 'User',
+                    key: 'id'
+                },
+                onDelete: 'CASCADE'
+            },
             type: {
                 type: DataTypes.ENUM,
                 values: ['private', 'group']
@@ -37,18 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             paranoid: true,//xóa mềm: soft delete
             freezeTableName: true,
-            // classMethods: {
-            //     generateHash(password) {
-            //         return BCrypt
-            //             .hash(password, 8)
-            //             .then((data) => {
-            //                 return data;
-            //             })
-            //             .catch(() => {
-            //                 return false;
-            //             });
-            //     }
-            // }
+
         }
     );
     Group.associate = (models) => {
