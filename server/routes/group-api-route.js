@@ -1,6 +1,6 @@
 'use strict';
 
-import {groupController,memberGroupController} from '../controllers';
+import {groupController,memberGroupController, blockController} from '../controllers';
 import { Authentication} from '../middlewares';
 
 
@@ -18,6 +18,8 @@ module.exports = (app) => {
         .get([Authentication.isAuth], groupController.getListMembersInGroup);
     app.route('/groups/:id/:memberId')
         .delete([Authentication.isAuth], groupController.removeMemberInGroup);
+    app.route('/groups/:id/blocks')
+        .get([Authentication.isAuth], blockController.getListGroupBlockUser);
 
 
 
