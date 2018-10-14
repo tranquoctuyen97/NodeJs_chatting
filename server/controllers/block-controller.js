@@ -74,4 +74,81 @@ export default class BlockController {
             return Response.returnError(res, e);
         }
     };
+
+    getListBlockUsers  = async (req, res, next) => {
+        try {
+            const  userLoginId = req.user.id;
+
+            const listBlocks = await blockRepository.getAll({
+                where: {
+                    authorId: userLoginId
+                },
+                attributes: ['id'],
+                include: [
+                    {
+                        model: User,
+                        as: 'user',
+                    },
+                ]
+            });
+
+            if (listBlocks.length === 0) {
+                return Response.returnSuccess(res, listBlocks);
+            }
+
+            let listBlockUsers = listBlocks.map(block =>{
+                return block.user;
+            });
+            return Response.returnSuccess(res, listBlockUsers)
+        } catch (e) {
+            return Response.returnError(res, e.message);
+        }
+    };
+
+    removeBlockUser = async (req, res, next) => {
+        try {
+            const  userLoginId = req.user.id;
+            const { id ,groupId } = req.params;
+            if ( !id ) {
+                return Response.returnError(res, new Error('Id is invalid'));
+            }
+            if ( !groupId ) {
+                return Response.returnError(res, new Error('groupId is invalid'));
+            }
+            const author = await groupRepository.getOne({
+                where: {
+                    id: groupId,
+                    authorId: userLoginId
+                },
+                attributes: ['id']
+
+            });
+            const isMember = await memberGroupRepository.getOne({
+                where: {
+                    groupId,
+                    userId: id
+                },
+                attributes: ['id']
+            });
+            if (!isMember) {
+                return Response.returnError(res, new Error('user is not a member of group'));
+            }
+            if (!author) {
+                return Response.returnError(res, new Error('author is not the admin of group'));
+            }
+
+            await blockRepository.delete({
+                where: {
+                    userId: id,
+                    groupId
+                }
+            });
+
+            return Response.returnSuccess(res, {
+                success: "true"
+            });
+        } catch (e) {
+            return Response.returnError(res, e.message);
+        }
+    }
 }
