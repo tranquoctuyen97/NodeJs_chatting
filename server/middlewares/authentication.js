@@ -39,4 +39,22 @@ export default class  Authentication {
             return Response.returnError(res, e);
         }
     };
+
+    static authenticateSocket = async (socket) => {
+        const token = socket.handshake.query.token;
+        if (token === undefined) {
+            return Promise.reject(new Error ('Cannot authenticate your connection'));
+        }
+        const jwtValid = await JWTHelper.verify(token);
+        const user = userRepository.getOne({
+            where: {
+                id: jwtValid.user.id
+            },
+            attributes: ('id')
+        });
+        if (!user) {
+            return (new Error('User invalidate'));
+        }
+        socket.user = jwtValid;
+    }
 }
